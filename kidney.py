@@ -3,14 +3,13 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 
-# Page configuration
 st.set_page_config(
     page_title="Chronic Kidney Disease Predictor",
     page_icon="🏥",
     layout="wide"
 )
 
-# Load model
+#Load model
 @st.cache_resource
 def load_model():
     try:
@@ -19,7 +18,6 @@ def load_model():
         st.error("Model file not found. Please ensure 'model_knn.sav' exists in the model directory.")
         return None
 
-# Input validation functions
 def validate_numeric_input(value, min_val, max_val, field_name):
     try:
         val = float(value)
@@ -34,7 +32,6 @@ def validate_categorical_input(value, valid_options, field_name):
         return None, f"{field_name} should be one of: {', '.join(valid_options)}"
     return value.lower(), None
 
-# Encoding mappings for categorical variables
 categorical_encodings = {
     'red_blood_cells': {'normal': 1, 'abnormal': 0},
     'pus_cell': {'normal': 1, 'abnormal': 0},
@@ -48,7 +45,6 @@ categorical_encodings = {
     'anemia': {'yes': 1, 'no': 0}
 }
 
-# Define input fields with their validation rules
 input_categories = {
     'Demographic Data': {
         'age': {'type': 'numeric', 'min': 0, 'max': 120, 'label': 'Age'},
@@ -82,7 +78,6 @@ input_categories = {
     }
 }
 
-# Create a flat list of field names in the correct order
 input_fields = []
 for category in input_categories.values():
     input_fields.extend(category.keys())
@@ -99,18 +94,16 @@ def main():
     if not model:
         return
 
-    # Title and description
     st.title('🏥 Chronic Kidney Disease Predictor')
     st.markdown("""
     This application helps predict the likelihood of chronic kidney disease based on various medical parameters.
     Please fill in all the fields below with the patient's information.
     """)
 
-    # Create form
     with st.form("prediction_form"):
         input_values = {}
         
-        # Create columns for each category
+        #columns for each category
         for category_name, fields in input_categories.items():
             st.subheader(category_name)
             cols = st.columns(4)
@@ -130,15 +123,13 @@ def main():
                 
                 col_idx = (col_idx + 1) % 4
 
-        # Submit button
         submitted = st.form_submit_button("Predict")
 
     if submitted:
-        # Validate all inputs
+        #Validate all inputs
         valid_inputs = {}
         has_errors = False
 
-        # Flatten the categories to get all fields
         all_fields = {}
         for category in input_categories.values():
             all_fields.update(category)
@@ -173,19 +164,18 @@ def main():
 
         if not has_errors:
             try:
-                # Prepare input for model using the ordered list of fields
                 input_array = [encode_input(field, valid_inputs[field]) for field in input_fields]
                 
-                # Make prediction
+                #Make prediction
                 prediction = model.predict([input_array])
                 
-                # Display result
+                #Display result
                 if prediction[0] == 1:
                     st.success("🟢 Patient is NOT likely to have Chronic Kidney Disease")
                 else:
                     st.error("🔴 Patient is likely to have Chronic Kidney Disease")
                 
-                # Display warning
+                #Display warning
                 st.warning("""
                     ⚠️ This prediction is for informational purposes only and should not be used as a substitute 
                     for professional medical advice. Please consult with a healthcare provider for proper diagnosis 
