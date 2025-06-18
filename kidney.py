@@ -100,11 +100,7 @@ def main():
         return
 
     # Title and description
-    st.title('🏥 Chronic Kidney Disease Predictor')
-    st.markdown("""
-    This application helps predict the likelihood of chronic kidney disease based on various medical parameters.
-    Please fill in all the fields below with the patient's information.
-    """)
+    st.title('Chronic Kidney Disease Predictor')
 
     # Create form
     with st.form("prediction_form"):
